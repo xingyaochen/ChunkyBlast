@@ -1,20 +1,20 @@
 # ChunkyBlast
 
 ## Materials
-The file tim-PF00121_seed.fa is a seed alignment for the triosephosphate isomerase (TIM) protein family from PFAM. You will build a profile hidden Markov model from this alignment.
+The file **tim-PF00121_seed.fa** is a seed alignment for the triosephosphate isomerase (TIM) protein family from PFAM. You will build a profile hidden Markov model from this alignment.
 
 (A note for the curious: triosephosphate isomerase is a glycolytic enzyme, widely distributed across the tree of life.  This particular enzyme is very effective, accelerating its reaction 10^9 fold. It has been termed a "perfect catalyst" in the sense that the rate of this reaction appears to be limited by the speed at which the product diffuses away from the enzyme, rather than the speed of activity of the enzyme itself.)
 
-The file tim-searchSeq.fa represents a triosephosphate isomerase sequence not in the seed alignment. It can be used for testing the alignment algorithms you will write.
+The file **tim-searchSeq.fa** represents a triosephosphate isomerase sequence not in the seed alignment. It can be used for _testing_ the alignment algorithms you will write.
 
-The multi fasta file unknownProts.fa is a set of unknown protein sequences which you can search with your model, trying to find those with significant similarity to the TIM family
+The multi fasta file **unknownProts.fa** is a set of unknown protein sequences which you can search with your model, trying to find those with significant similarity to the TIM family
 
-The python files alignOne.py and search.py will provide the interface for aligning one sequence against the model, or searching a whole set. You will want to modify them, and also create several other support files with functions and classes which they import. Once your code is complete, they can be used like this:
+The python files alignOne.py and search.py will provide the interface for _aligning one sequence against the model_, or _searching a whole set_. You will want to modify them, and also create several other support files with functions and classes which they import. Once your code is complete, they can be used like this:
 
 python alignOne.py tim-PF00121_seed.fa tim-searchSeq.fa
 python search.py tim-PF00121_seed.fa unknownProts.fa timOut.txt
 
-The file unknownProts.fa contains 101 sequences. A couple of these are actually related to triosephosphate isomerase. Because we're not doing any sort of statistics with our searches, you won't have any way of knowing what log odds score is high enough to definitively indicate homology. However if things are working right, there should be several sequences at the top of your list with much higher scores than the rest.
+The file unknownProts.fa contains 101 sequences. A couple of these are actually related to triosephosphate isomerase. Because we're not doing any sort of statistics with our searches, you won't have any way of knowing what log odds score is high enough to definitively indicate homology. However if things are working right, _there should be several sequences at the top of your list with much higher scores than the rest_.
 
 ## The Model
 
