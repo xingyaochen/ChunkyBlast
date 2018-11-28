@@ -36,11 +36,9 @@ class HmmModel:
         calculate the emmision probability for matching state with number stateNum
         fill the entry in the dictionary
         """
-        # assume stateNum indexes self.matchStates
-        seqPosition = self.matchStates[stateNum]
-
+        # assume stateNum indexes sequnece position
         # get the corresponding column
-        columnData = [seq[1][seqPosition] for seq in self.info]
+        columnData = [seq[1][stateNum] for seq in self.info]
 
         # make a dict of aa counts 
         countsD = Counter(columnData)
@@ -61,11 +59,20 @@ class HmmModel:
         # put dictionary into meta dictionarys
         self.emmit[stateNum] = stateNumD
 
-    
-    def calcTransProb(self,state1,state2 ):
+
+    def calcTransProb(self, state1, state2):
         """
         calculate the transition probability for going from state1 to state2
         """
+        # state: (type, pos), ex: ('M', 0), ('D', 1)
+        curPos = state1[1]
+        nextPos = curPos+1
+        doubleColData = [seq[1][curPos:nextPos+1] for seq in self.info]
+        pass
+
+
+
+
     
 
 
