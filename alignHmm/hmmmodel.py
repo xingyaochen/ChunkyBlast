@@ -34,7 +34,7 @@ class HmmModel:
         return 
 
     def calcAllEmitProb(self):
-        for matchStateNum in self.matchStates:
+        for matchStateNum in range(1,len(self.matchStates)+1):
             self.calcEmitProb(matchStateNum)
             
     def calcEmitProb(self,stateNum):
@@ -44,7 +44,7 @@ class HmmModel:
         """
         # assume stateNum indexes sequnece position
         # get the corresponding column
-        columnData = [seq[1][stateNum] for seq in self.info]
+        columnData = [seq[1][self.matchStates[stateNum-1]] for seq in self.info]
 
         # make a dict of aa counts 
         countsD = Counter(columnData)
