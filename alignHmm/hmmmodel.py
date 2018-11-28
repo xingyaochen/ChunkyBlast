@@ -1,5 +1,7 @@
 from fasta import load
 from collections import Counter
+
+aaList=['G','A','L','M','F','W','K','Q','E','S','P','V','I','C','Y','H','R','N','D','T']
 class HmmModel:
     def __init__(self,filename):
         self.filename=filename
@@ -31,6 +33,10 @@ class HmmModel:
         self.matchStates=matches
         return 
 
+    def calcAllEmitProb(self):
+        for matchStateNum in self.matchStates:
+            self.calcEmitProb(matchStateNum)
+            
     def calcEmitProb(self,stateNum):
         """
         calculate the emmision probability for matching state with number stateNum
@@ -53,8 +59,11 @@ class HmmModel:
         stateNumD = {}
 
         # put probs in a dictionary
-        for key, val in countsD.items():
-            stateNumD[key] = (val+1)/denominator 
+        for aa in aaList:
+            if aa in countsD:
+                stateNumD[aa]=(countsD[aa]+1)/float(denominator)
+            else:
+                stateNumD[aa] = 1.0/denominator
 
         # put dictionary into meta dictionarys
         self.emmit[stateNum] = stateNumD
