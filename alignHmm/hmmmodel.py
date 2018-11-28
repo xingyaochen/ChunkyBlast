@@ -76,18 +76,31 @@ class HmmModel:
         # state: (type, pos), ex: ('M', 0), ('D', 1)
         curPos = state1[1]
         nextPos = state2[1]
-        doubleColData = [seq[1][curPos:nextPos+1] for seq in self.info]
+        state1Col = [seq[1][curPos] for seq in self.info]
+        state2Col = [seq[1][nextPos] for seq in self.info]
 
         transitionD = {}
-
-        for aa in doubleColData:
-            if len(aa) = 2:
-                # M to D or D to M or M to M 
-                #add to transitionD
-            elif len(aa) == 1:
-                # involves I 
-                #add to transitionD
-        pass
+        # for D and M cases
+        if curPos!=nextPos:
+            for i in range(len(state1Col)):
+                stateTransType = ""
+                aa1 = state1Col[i]
+                aa2 = state2Col[i]
+                if aa1 in aaList:
+                    stateTransType +="M"
+                elif aa1 == ".":
+                    stateTransType+="D"
+                
+                if aa2 in aaList:
+                    stateTransType +="M"
+                elif aa2  == ".":
+                    stateTransType+="D"
+                if stateTransType in transitionD:
+                    transitionD[stateTransType] +=1
+                else:
+                    transitionD[stateTransType] = 1
+        # for I cases????
+        return
 
 
 # we may not need all this ...
