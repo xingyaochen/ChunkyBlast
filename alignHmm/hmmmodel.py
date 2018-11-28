@@ -68,6 +68,13 @@ class HmmModel:
         # put dictionary into meta dictionarys
         self.emmit[stateNum] = stateNumD
 
+    def calAllTransProb(self):
+        #lets encode begin as M0, end as M_len(self.matchStates)
+        for i in range(len(self.matchStates)):
+            self.calcTransProb(i,i+1)
+      
+
+
 
     def calcTransProb(self, state1Num, state2Num):
         """
@@ -75,11 +82,16 @@ class HmmModel:
         """
         # state: (type, pos), ex: ('M', 0), ('D', 1)
         transitionD = self.tallyTransD(state1Num, state2Num) 
+        if state2Num<=len(self.matchStates):
+            allPossibleTrans = [ "M" , "I", "D"]
+        else:
+            allPossibleTrans = [ "M" , "I"]
 
-        allPossibleTrans = [ "M" , "I", "D"]
         # calculate all denominator types
+        #plus 3 for number of states to transition to
         demominatorM = sum([transitionD["M"+trans] for trans in allPossibleTrans]) + 3  # sum of MM, MI, MD
-        demominatorD = sum([transitionD["D"+trans] for trans in allPossibleTrans]) + 3  # sum of DM, DI, DD
+        if state1Num!=0:
+            demominatorD = sum([transitionD["D"+trans] for trans in allPossibleTrans]) + 3  # sum of DM, DI, DD
         demominatorI = sum([transitionD["I"+trans] for trans in allPossibleTrans]) + 3  # sum of IM, II, ID
         
         # for-loop to make all possible transition types
@@ -111,7 +123,8 @@ class HmmModel:
                 # put probs into the transition prob dictionary 
                 if fromStateTuple not in self.transit:
                     self.transit[fromStateTuple] = {}
-                self.transit[fromStateTuple][toStateTuple] = float(numerator)/demominator
+                #plus 1 in numerator for pseudocount
+                self.transit[fromStateTuple][toStateTuple] = float(numerator+1)/demominator
 
 
             
@@ -121,12 +134,30 @@ class HmmModel:
         tally up all transition types going from match state 1 to match state 2
         """
         transitionD = {}
+        if state1Num==0:
+            #from begin
+            nextPos = self.matchStates[state2Num-1] 
+            state2Col = [seq[1][nextPos] for seq in self.info]
+            if nextPos==0:
+                transitionD["II"]=1.0/3
+                transitionD["ID"]=1.0/3
+                transitionD["IM"]=1./3
+                transitionD["MI"]=1.0/(len(self.info)+3)
+                transitionD["MD"]=float(state2Col.count('.')+1)/(len(self.info)+3)
+                transitionD["MM"]=float(len(self.info)-state2Col.count('.')+1)/(len(self.info)+3)
+            if nextPos!=0:
+                nextPos = self.matchStates[state2Num-1]
+                initialStateInfo=[seq[1][:nextPos] for seq in self.info]
+
+                ###TODO
+                
+
         curPos = self.matchStates[state1Num-1] 
         nextPos = self.matchStates[state2Num-1] 
         state1Col = [seq[1][curPos] for seq in self.info]
         state2Col = [seq[1][nextPos] for seq in self.info]
         stateMidCol = [seq[1][curPos+1:nextPos] for seq in self.info]
-        transitionD = {"II": 1, "IM": 1, "ID":1, "MM":1, "MI":1, "MD":1, "DD":1, "DI":1, "DM":1}
+        transitionD = {"II": 0, "IM": 0, "ID":0, "MM":0, "MI":0, "MD":0, "DD":0, "DI":0, "DM":0}
         for i in range(len(state1Col)):
             stateTransType = ""
             aa1 = state1Col[i]
@@ -169,33 +200,6 @@ class HmmModel:
             return transitionD
 
 
-# we may not need all this ...
-    def transProbMtoM(self, curPos, nextPos):
-        pass 
-    
-    def transProbMtoI(self, curPos, nextPos):
-        pass 
-    
-    def transProbMtoD(self, curPos, nextPos):
-        pass 
-    
-    def transProbDtoM(self, curPos, nextPos):
-        pass 
-    
-    def transProbDtoI(self, curPos, nextPos):
-        pass 
-    
-    def transProbDtoD(self, curPos, nextPos):
-        pass 
-    
-    def transProbItoM(self, curPos, nextPos):
-        pass 
-    
-    def transProbItoI(self, curPos, nextPos):
-        pass 
-    
-    def transProbItoD(self, curPos, nextPos):
-        pass 
 
     
 
