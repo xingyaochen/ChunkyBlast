@@ -69,38 +69,104 @@ class HmmModel:
         self.emmit[stateNum] = stateNumD
 
 
-    def calcTransProb(self, state1, state2):
+    def calcTransProb(self, state1Num, state2Num):
         """
         calculate the transition probability for going from state1 to state2
         """
         # state: (type, pos), ex: ('M', 0), ('D', 1)
-        curPos = state1[1]
-        nextPos = state2[1]
+        transitionD = self.tallyTransD(state1Num, state2Num) 
+
+        allPossibleTrans = [ "M" , "I", "D"]
+        # calculate all denominator types
+        demominatorM = sum([transitionD["M"+trans] for trans in allPossibleTrans]) + 3  # sum of MM, MI, MD
+        demominatorD = sum([transitionD["D"+trans] for trans in allPossibleTrans]) + 3  # sum of DM, DI, DD
+        demominatorI = sum([transitionD["I"+trans] for trans in allPossibleTrans]) + 3  # sum of IM, II, ID
+        
+        # for-loop to make all possible transition types
+        for i in range(len(allPossibleTrans)):
+            fromState = allPossibleTrans[i]
+            for j in range(len(allPossibleTrans)):
+                toState = allPossibleTrans[j] 
+
+                # depending on fromState, select the demominator to use
+                if fromState == "M":
+                    demominator = demominatorM 
+                elif fromState == "I":
+                    demominator = demominatorI 
+                elif fromState == "D":
+                    demominator = demominatorD  
+
+                # get numerator
+                numerator = transitionD[fromState+toState]
+
+                # make keys for transit dict
+                fromStateTuple = (fromState, state1Num)
+
+                # special Insert case????
+                if toState == "I":
+                    toStateTuple = (toState, state1Num)
+                else:
+                    toStateTuple = (toState, state2Num)
+
+                # put probs into the transition prob dictionary 
+                if fromStateTuple not in self.transit:
+                    self.transit[fromStateTuple] = {}
+                self.transit[fromStateTuple][toStateTuple] = float(numerator)/demominator
+
+
+            
+
+    def tallyTransD(self, state1Num, state2Num):
+        """
+        tally up all transition types going from match state 1 to match state 2
+        """
+        transitionD = {}
+        curPos = self.matchStates[state1Num-1] 
+        nextPos = self.matchStates[state2Num-1] 
         state1Col = [seq[1][curPos] for seq in self.info]
         state2Col = [seq[1][nextPos] for seq in self.info]
-
-        transitionD = {}
-        # for D and M cases
-        if curPos!=nextPos:
+        stateMidCol = [seq[1][curPos+1:nextPos] for seq in self.info]
+        transitionD = {"II": 1, "IM": 1, "ID":1, "MM":1, "MI":1, "MD":1, "DD":1, "DI":1, "DM":1}
+        for i in range(len(state1Col)):
+            stateTransType = ""
+            aa1 = state1Col[i]
+            aa2 = state2Col[i]
+            if aa1 in aaList:
+                stateTransType +="M"
+            elif aa1 == ".":
+                stateTransType+="D"
+            if aa2 in aaList:
+                stateTransType +="M"
+            elif aa2  == ".":
+                stateTransType+="D"
+            if stateTransType in transitionD:
+                transitionD[stateTransType] +=1
+            else:
+                transitionD[stateTransType] = 1 
+        if stateMidCol[0]:
             for i in range(len(state1Col)):
                 stateTransType = ""
                 aa1 = state1Col[i]
                 aa2 = state2Col[i]
                 if aa1 in aaList:
-                    stateTransType +="M"
+                    stateTransType ="MI"
                 elif aa1 == ".":
-                    stateTransType+="D"
+                    stateTransType+="DI" 
+
+                transitionD[stateTransType] += 1
+              
                 
                 if aa2 in aaList:
-                    stateTransType +="M"
-                elif aa2  == ".":
-                    stateTransType+="D"
-                if stateTransType in transitionD:
-                    transitionD[stateTransType] +=1
-                else:
-                    transitionD[stateTransType] = 1
-        # for I cases????
-        return
+                    stateTransType ="IM"
+                elif aa2 == ".":
+                    stateTransType = "ID" 
+                transitionD[stateTransType] += 1
+               
+                numInserts = len(stateMidCol[i]) - stateMidCol[i].count('.')
+                stateTransType = "II"
+                if numInserts:
+                    transitionD[stateTransType] += numInserts-1
+            return transitionD
 
 
 # we may not need all this ...
