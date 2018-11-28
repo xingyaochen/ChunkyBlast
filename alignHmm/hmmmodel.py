@@ -34,7 +34,7 @@ class HmmModel:
         return 
 
     def calcAllEmitProb(self):
-        for matchStateNum in range(1,len(self.matchStates)+1):
+        for matchStateNum in range(len(self.matchStates)+1):
             self.calcEmitProb(matchStateNum)
             
     def calcEmitProb(self,stateNum):
