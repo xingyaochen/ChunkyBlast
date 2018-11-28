@@ -75,12 +75,48 @@ class HmmModel:
         """
         # state: (type, pos), ex: ('M', 0), ('D', 1)
         curPos = state1[1]
-        nextPos = curPos+1
+        nextPos = state2[1]
         doubleColData = [seq[1][curPos:nextPos+1] for seq in self.info]
+
+        transitionD = {}
+
+        for aa in doubleColData:
+            if len(aa) = 2:
+                # M to D or D to M or M to M 
+                #add to transitionD
+            elif len(aa) == 1:
+                # involves I 
+                #add to transitionD
         pass
 
 
-
+# we may not need all this ...
+    def transProbMtoM(self, curPos, nextPos):
+        pass 
+    
+    def transProbMtoI(self, curPos, nextPos):
+        pass 
+    
+    def transProbMtoD(self, curPos, nextPos):
+        pass 
+    
+    def transProbDtoM(self, curPos, nextPos):
+        pass 
+    
+    def transProbDtoI(self, curPos, nextPos):
+        pass 
+    
+    def transProbDtoD(self, curPos, nextPos):
+        pass 
+    
+    def transProbItoM(self, curPos, nextPos):
+        pass 
+    
+    def transProbItoI(self, curPos, nextPos):
+        pass 
+    
+    def transProbItoD(self, curPos, nextPos):
+        pass 
 
     
 
