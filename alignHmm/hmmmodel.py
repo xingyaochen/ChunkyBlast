@@ -16,8 +16,11 @@ class HmmModel:
     def getEmitProb(self, stateNum, aa):
         return self.emmit[stateNum][aa]
     
-    def getTransitProb(self, fromeState, toState):
-        return self.transit[fromeState][toState]
+    def getTransitProb(self, fromState, toState):
+        """
+        both fromState and toState needs to follow format ("M", 1)
+        """
+        return self.transit[fromState][toState]
 
 
     def findStates(self):
@@ -262,7 +265,7 @@ class HmmModel:
                 stateTransType = "II"
                 if numInserts:
                     transitionD[stateTransType] += numInserts-1
-    return transitionD
+        return transitionD
 
 
 
