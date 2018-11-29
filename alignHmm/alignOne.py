@@ -1,6 +1,11 @@
 import sys, fasta
+import hmmmodel
 
-
+def alignmentScores(model,sseq):
+    """
+    implements the viterbi global alignment and calculate the alignment
+    score for sseq against the model
+    """
 #### Main
 
 if __name__ == "__main__":
@@ -17,9 +22,10 @@ if __name__ == "__main__":
     protSeqFN = sys.argv[2]
 
     # create profile HMM based on seed alignment
-    seedAlignL = [seq for header,seq in fasta.load(seedAlignFN)]
-
+    model=hmmmodel.HmmModel(seedAlignFN)
 
     # load db
     sseq = fasta.load(protSeqFN)[0][1]
+
+    scores=alignmentScores(model,sseq)
 
