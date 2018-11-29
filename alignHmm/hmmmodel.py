@@ -11,6 +11,14 @@ class HmmModel:
         self.info=None
         self.matchStates=None
         self.findStates()
+    
+
+    def getEmitProb(self, stateNum, aa):
+        return self.emmit[stateNum][aa]
+    
+    def getTransitProb(self, fromeState, toState):
+        return self.transit[fromeState][toState]
+
 
     def findStates(self):
         """
@@ -21,8 +29,6 @@ class HmmModel:
         self.info=info
         numCol=len(info[0][1])
         matches=[]
-        
-        
         for i in range(numCol):
             count=0
             for x in range(len(info)):
@@ -72,8 +78,6 @@ class HmmModel:
         #lets encode begin as M0, end as M_len(self.matchStates)+1
         for i in range(len(self.matchStates)+1):
             self.calcTransProb(i,i+1)
-      
-
 
 
     def calcTransProb(self, state1Num, state2Num):
@@ -130,9 +134,8 @@ class HmmModel:
                     self.transit[fromStateTuple] = {}
                 #plus 1 in numerator for pseudocount
                 self.transit[fromStateTuple][toStateTuple] = float(numerator+1)/demominator
-
-
-            
+        
+        
 
     def tallyTransD(self, state1Num, state2Num):
         """
@@ -178,7 +181,7 @@ class HmmModel:
                     if numInserts!=0:
                         transitionD[stateTransType] += numInserts-1
                 
-            return transitionD
+            # return transitionD
         
         if state2Num==len(self.matchStates)+1:
             #special case for from last match to ending
@@ -212,13 +215,7 @@ class HmmModel:
                     stateTransType = "II"
                     if numInserts!=0:
                         transitionD[stateTransType] += numInserts-1
-            return transitionD
-
-
-
-            
-
-                
+            # return transitionD
 
         curPos = self.matchStates[state1Num-1] 
         nextPos = self.matchStates[state2Num-1] 
@@ -265,7 +262,7 @@ class HmmModel:
                 stateTransType = "II"
                 if numInserts:
                     transitionD[stateTransType] += numInserts-1
-            return transitionD
+    return transitionD
 
 
 
