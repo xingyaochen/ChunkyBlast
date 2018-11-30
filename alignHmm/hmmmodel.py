@@ -137,8 +137,8 @@ class HmmModel:
                 # put probs into the transition prob dictionary 
                 if fromStateTuple not in self.transit:
                     self.transit[fromStateTuple] = {}
-                #plus 1 in numerator for pseudocount
-                self.transit[fromStateTuple][toStateTuple] = float(numerator+1)/demominator
+                #plus 1 in numerator for pseudocount, log it here 
+                self.transit[fromStateTuple][toStateTuple] = math.log(float(numerator+1)/demominator)
         
         
 
