@@ -49,9 +49,10 @@ class HmmAlign:
         for i in range(1, len(seq)+1):
             aa = seq[i]
             for j in range(1, len(states)+2):
-                #already logged
-                e_m = hmmmodel.getEmitProb(st, aa) 
+                
+                e_m = hmmmodel.getEmitProb(j, aa) 
 
+                #already logged
                 amm = hmmmodel.getTransitProb(('M', j-1), ('M', j))
                 aim = hmmmodel.getTransitProb(('I', j-1), ('M', j))
                 adm = hmmmodel.getTransitProb(('D', j-1), ('M', j))
@@ -64,8 +65,6 @@ class HmmAlign:
                 aid = hmmmodel.getTransitProb(('I', i-1), ('D', j))
                 add = hmmmodel.getTransitProb(('D', j-1), ('D', j))
 
-                # for just v_m 
-
                 m_threeProbs = [v_m[j-1][i-1]["prob"] + amm , v_i[j-1][i-1]["prob"] + aim, v_d[j-1][i-1]["prob"] + adm] 
                 i_threeProbs = [v_m[j][i-1]["prob"] + ami , v_i[j][i-1]["prob"] + aii, v_d[j][i-1]["prob"] + adi]
                 d_threeProbs = [v_m[j-1][i]["prob"] + amd , v_i[j-1][i]["prob"] + aid, v_d[j-1][i]["prob"] + add]
@@ -77,17 +76,31 @@ class HmmAlign:
                 prev_state_i = (self.states[np.argmax(i_threeProbs)], j, i-1)
                 prev_state_d = (self.states[np.argmax(d_threeProbs)], j-1, i)
                 
-                v_m[i][j] = {"prob": math.log(e_m / qxi)  + max_prob_m, "prev": prev_state_m}
-                v_i[i][j] = {"prob": max_prob_i, "prev": prev_state_i}
-                v_d[i][j] = {"prob": max_prob_d, "prev": prev_state_d}
+                v_m[j][i] = {"prob": math.log(e_m / qxi)  + max_prob_m, "prev": prev_state_m}
+                v_i[j][i] = {"prob": max_prob_i, "prev": prev_state_i}
+                v_d[j][i] = {"prob": max_prob_d, "prev": prev_state_d}
 
+            bestScore=v_m[len(states)+1][len(seq)] # this is not last column 
+            return bestScore, [vm, vi, vd]
+            
 
-           
-            
-        bestScore=v_m[len(states)+1][len(seq)]
-        return bestScore
-            
-        
+        def backTrack(vm, vi, vd):
+            seq = self.seq
+            states = self.hmmmodel.matchStates
+            state, j, i = v_m[len(states)+1][len(seq)]["prev"]
+            stateL = [state]
+            while i >= 0:
+                if state == "M":
+                    state, j, i = v_m[j][i]["prev"]
+                elif state == "I"
+                    state, j, i = v_m[j][i]["prev"]
+                elif state == "D":
+                    state, j, i = v_m[j][i]["prev"]
+                
+                stateL.append(state)
+            stateL = stateL[::-1]
+            return self.retrieveAlignment(stateL)
+
         def retrieveAlignment(self, stateL):
             seq = self.seq 
             alignment_seq = []
@@ -97,6 +110,7 @@ class HmmAlign:
                     alignment_seq.append(seq[i])
                 else:
                     alignment_seq.append('-')
+            return alignment_seq
 
 
 
