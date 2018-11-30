@@ -12,9 +12,10 @@ class HmmAlign:
         self.states = ['M', 'I', 'D']
 
     def viterbi(self):
+        #searching seq
         seq = self.seq
         stateL = [] 
-        v_m = 0 # idk how to initialize
+        v_m = 0 
         v_i = 0 
         v_d = 0 
 

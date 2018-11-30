@@ -1,5 +1,6 @@
 from fasta import load
 from collections import Counter
+import math
 
 aaList=['G','A','L','M','F','W','K','Q','E','S','P','V','I','C','Y','H','R','N','D','T']
 class HmmModel:
