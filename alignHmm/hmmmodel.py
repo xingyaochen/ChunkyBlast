@@ -7,10 +7,12 @@ class HmmModel:
         self.filename=filename
         self.emmit={}
         self.transit={}
-        self.num_states=0
         self.info=None
         self.matchStates=None
         self.findStates()
+        self.calAllTransProb()
+        self.calcAllEmitProb()
+
     
 
     def getEmitProb(self, stateNum, aa):

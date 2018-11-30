@@ -4,8 +4,11 @@ import hmmmodel
 def alignmentScores(model,sseq):
     """
     implements the viterbi global alignment and calculate the alignment
-    score for sseq against the model
+    score for sseq against the model.
+    Align sequence to model using affine gap type global alignment algorithm.
     """
+    totLength=len(model.info[0][1])
+    
 #### Main
 
 if __name__ == "__main__":
