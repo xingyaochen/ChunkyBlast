@@ -5,6 +5,8 @@ import numpy as np
 from hmmmodel 
 import numpy as np
 
+
+
 class HmmAlign:
      def __init__(self, fastaName, hmmmodel):
         self.seq = fasta.load(fastaName)[1]
@@ -14,22 +16,18 @@ class HmmAlign:
     def viterbi(self):
         #searching seq
         seq = self.seq
-        stateL = [] 
-        v_m = 0 
-        v_i = 0 
-        v_d = 0 
-
-        for i in range(1, len(seq)):
+        states = self.hmmmodel.matchStates
+        v_m, v_i, v_d = [[None]*len(seq) for i in range(len(states))], [[None]*len(seq) for i in range(len(states))], [[None]*len(seq) for i in range(len(states))]
+        for stNum in range(len(states)):
+            v_m[stNum][0] = {"prob": 0, "prev": None}
+            v_i[stNum][0] = {"prob": 0, "prev": None}
+            v_d[stNum][0] = {"prob": 0, "prev": None}
+        qxi = 666 
+        for i in range(1, len(seq)-1):
             aa = seq[i]
-            e_m = hmmmodel.getEmitProb(e_i, aa) 
-            qxi = 666
-            beforeTerm_m = math.log(e_m/qxi) 
+            for j in range(1, len(states)):
+                e_m = hmmmodel.getEmitProb(st, aa) 
 
-            prev_v_m = v_m
-            prev_v_i = v_i
-            prev_v_d = v_d
-
-            if i < len(seq) -1: # middle states
                 amm = hmmmodel.getTransitProb(('M', i), ('M', i+1))
                 aim = hmmmodel.getTransitProb(('I', i), ('M', i))
                 adm = hmmmodel.getTransitProb(('D', i), ('M', i+1))
@@ -42,44 +40,31 @@ class HmmAlign:
                 aid = hmmmodel.getTransitProb(('I', i), ('D', i))
                 add = hmmmodel.getTransitProb(('D', i), ('D', i+1))
 
-                v_m = beforeTerm_m  + max( prev_v_m + amm, prev_v_i + aim, prev_v_d + adm)
-                v_i =  max( prev_v_m + ami, prev_v_i + aii, prev_v_d + adi)
-                v_d =  max( prev_v_m + amd, prev_v_i + aid, prev_v_d + add)
+                # for just v_m 
 
-            else: # last state????
-                amm = hmmmodel.getTransitProb(('M', i), ('M', i+1))
-                aim = hmmmodel.getTransitProb(('I', i), ('M', i))
-                adm = hmmmodel.getTransitProb(('D', i), ('M', i+1))
+                m_threeProbs = [v_m[j-1][i-1]["prob"] + amm , v_i[j-1][i-1]["prob"] + aim, v_d[j-1][i-1]["prob"] + adm] 
 
-                ami = hmmmodel.getTransitProb(('M', i), ('I', i))
-                aii = hmmmodel.getTransitProb(('I', i), ('I', i))
-                adi = hmmmodel.getTransitProb(('D', i), ('I', i))
-
-                amd = hmmmodel.getTransitProb(('M', i), ('D', i+1))
-                aid = hmmmodel.getTransitProb(('I', i), ('D', i))
-                add = hmmmodel.getTransitProb(('D', i), ('D', i+1))
-
-                v_m =  max( prev_v_m + amm, prev_v_i + aim, prev_v_d + adm)
-                v_i =  max( prev_v_m + ami, prev_v_i + aii, prev_v_d + adi)
-                v_d =  max( prev_v_m + amd, prev_v_i + aid, prev_v_d + add)
+                max_prob_m = np.amax(m_threeProbs)
+                prev_state_m = (self.states[np.argmax(m_threeProbs)], i-1, j-1)
+                
+                vm[i][j] = {"prob": math.log(e_m / qxi)  + max_prob_m, "prev": prev_state_m}
 
 
-            which_best = np.argmax([v_m, v_i, v_d])
-            best_score = np.amax([v_m, v_i, v_d])
-            best_state = self.states[which_best]
-            stateL.append(best_state)
+                # TODO: do the same for v_i and v_d
+
+            # TODO: take care of edge cases
             
-        return best_score, stateL
-    
-    def retrieveAlignment(self, stateL):
-        seq = self.seq 
-        alignment_seq = []
-        for i in range(len(seq)):
-            state = stateL[i]
-            if state == 'M':
-                alignment_seq.append(seq[i])
-            else:
-                alignment_seq.append('-')
+            
+        
+        def retrieveAlignment(self, stateL):
+            seq = self.seq 
+            alignment_seq = []
+            for i in range(len(seq)):
+                state = stateL[i]
+                if state == 'M':
+                    alignment_seq.append(seq[i])
+                else:
+                    alignment_seq.append('-')
 
 
 
