@@ -17,11 +17,15 @@ class HmmAlign:
         #searching seq
         seq = self.seq
         states = self.hmmmodel.matchStates
-        v_m, v_i, v_d = [[None]*len(seq) for i in range(len(states))], [[None]*len(seq) for i in range(len(states))], [[None]*len(seq) for i in range(len(states))]
-        for stNum in range(len(states)):
-            v_m[stNum][0] = {"prob": 0, "prev": None}
-            v_i[stNum][0] = {"prob": 0, "prev": None}
-            v_d[stNum][0] = {"prob": 0, "prev": None}
+        #matrices have index (j,i) where j range from 0 to len(states)+1, i ranges from 0 to len(seq)-1
+        v_m, v_i, v_d = [[None]*(len(seq)+1) for i in range(len(states)+2)], [[None]*len(seq) for i in range(len(states)+2)], [[None]*len(seq) for i in range(len(states)+2)]
+        #initialize:
+        #matching state matrix
+        v_m[0][0]={"prob": 0, "prev": None}
+        # for stNum in range(len(states)+1):
+        #     v_m[stNum][0] = {"prob": 0, "prev": None}
+        #     v_i[stNum][0] = {"prob": 0, "prev": None}
+        #     v_d[stNum][0] = {"prob": 0, "prev": None}
         qxi = 666 
         for i in range(1, len(seq)-1):
             aa = seq[i]
@@ -54,6 +58,8 @@ class HmmAlign:
 
             # TODO: take care of edge cases
             
+        bestScore=v_m[len(states)+1][len(seq)-1]
+        return bestScore
             
         
         def retrieveAlignment(self, stateL):
