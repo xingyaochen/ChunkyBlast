@@ -109,10 +109,11 @@ class HmmModel:
 
         # calculate all denominator types
         #plus 3 for number of states to transition to
-        demominatorM = sum([transitionD["M"+trans] for trans in PossibleTransTo]) + len(PossibleTransTo)  # sum of MM, MI, MD
+        # print(transitionD)
+        demominatorM = sum([transitionD["M"+trans] for trans in PossibleTransFrom]) + len(PossibleTransTo)  # sum of MM, MI, MD
         if state1Num!=0:
-            demominatorD = sum([transitionD["D"+trans] for trans in PossibleTransTo]) + len(PossibleTransTo)  # sum of DM, DI, DD
-        demominatorI = sum([transitionD["I"+trans] for trans in PossibleTransTo]) + len(PossibleTransTo)  # sum of IM, II, ID
+            demominatorD = sum([transitionD["D"+trans] for trans in PossibleTransFrom]) + len(PossibleTransTo)  # sum of DM, DI, DD
+        demominatorI = sum([transitionD["I"+trans] for trans in PossibleTransFrom]) + len(PossibleTransTo)  # sum of IM, II, ID
         
         # for-loop to make all possible transition types
         for i in range(len(PossibleTransFrom)):
@@ -152,11 +153,11 @@ class HmmModel:
         """
         tally up all transition types going from match state 1 to match state 2
         """
-        transitionD = {}
+        transitionD = {"II": 0, "IM": 0, "ID":0, "MM":0, "MI":0, "MD":0, "DD":0, "DI":0, "DM":0}
         #special edge case for from beginning states to match1 etc.
         if state1Num==0:
             #from begin
-            transitionD = {"II": 0, "IM": 0, "ID":0, "MM":0, "MI":0, "MD":0}
+            # transitionD = {"II": 0, "IM": 0, "ID":0, "MM":0, "MI":0, "MD":0}
             nextPos = self.matchStates[state2Num-1] 
             state2Col = [seq[1][nextPos] for seq in self.info]
             if nextPos==0:
@@ -196,7 +197,7 @@ class HmmModel:
         
         if state2Num==len(self.matchStates)+1:
             #special case for from last match to ending
-            transitionD = {"II": 0, "IM": 0, "MM":0, "MI":0,"DI":0, "DM":0}
+            # transitionD = {"II": 0, "IM": 0, "MM":0, "MI":0,"DI":0, "DM":0}
             curPos = self.matchStates[state1Num-1] 
             state1Col = [seq[1][curPos] for seq in self.info]
             if curPos==len(self.info[0][1])-1:
@@ -229,13 +230,10 @@ class HmmModel:
             return transitionD
 
         curPos = self.matchStates[state1Num-1] 
-        print("len match state", len(self.matchStates))
-        print("s2num:", state2Num)
         nextPos = self.matchStates[state2Num-1] 
         state1Col = [seq[1][curPos] for seq in self.info]
         state2Col = [seq[1][nextPos] for seq in self.info]
         stateMidCol = [seq[1][curPos+1:nextPos] for seq in self.info]
-        transitionD = {"II": 0, "IM": 0, "ID":0, "MM":0, "MI":0, "MD":0, "DD":0, "DI":0, "DM":0}
         for i in range(len(state1Col)):
             stateTransType = ""
             aa1 = state1Col[i]

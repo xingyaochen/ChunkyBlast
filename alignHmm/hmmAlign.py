@@ -18,7 +18,7 @@ class HmmAlign:
         seq = self.seq
         states = self.hmmmodel.matchStates
         #matrices have j rows ,i columns where j range from 0 to len(states)+1, i ranges from 0 to len(seq)-1
-        v_m, v_i, v_d = [[None]*(len(seq)+1) for i in range(len(states)+2)], [[None]*len(seq) for i in range(len(states)+2)], [[None]*len(seq) for i in range(len(states)+2)]
+        v_m, v_i, v_d = [[None]*(len(seq)+1) for i in range(len(states)+2)], [[None]*(len(seq)+1) for i in range(len(states)+2)], [[None]*(len(seq)+1) for i in range(len(states)+2)]
         #initialize:
 
         #initialize M matrix
@@ -36,11 +36,14 @@ class HmmAlign:
             #can't match fake position to any insertion state
             v_i[j][0]={"prob": float('-inf'), "prev": None}
         #end initialize I matrix
+        for i in range(1,len(seq)+1):
+            #I0 doesn't exit
+            v_i[0][i]={"prob": float('-inf'), "prev": None}
 
         #initialize D matrix:
         for i in range(1,len(seq)+1):
             #D0 doesn't exit
-            v_m[0][i]={"prob": float('-inf'), "prev": None}
+            v_d[0][i]={"prob": float('-inf'), "prev": None}
         for j in range(len(states)+2):
             #can't match fake position to any insertion state
             v_d[j][0]={"prob": float('-inf'), "prev": None}
@@ -65,12 +68,13 @@ class HmmAlign:
                 adi = self.hmmmodel.getTransitProb(('D', j), ('I', j))
 
                 amd = self.hmmmodel.getTransitProb(('M', j-1), ('D', j))
-                aid = self.hmmmodel.getTransitProb(('I', i-1), ('D', j))
+                aid = self.hmmmodel.getTransitProb(('I', j-1), ('D', j))
                 add = self.hmmmodel.getTransitProb(('D', j-1), ('D', j))
                 
                 m_threeProbs = [v_m[j-1][i-1]["prob"] + amm , v_i[j-1][i-1]["prob"] + aim, v_d[j-1][i-1]["prob"] + adm] 
                 i_threeProbs = [v_m[j][i-1]["prob"] + ami , v_i[j][i-1]["prob"] + aii, v_d[j][i-1]["prob"] + adi]
-                
+                print(j)
+                print(i)
                 d_threeProbs = [v_m[j-1][i]["prob"] + amd , v_i[j-1][i]["prob"] + aid, v_d[j-1][i]["prob"] + add]
 
 
