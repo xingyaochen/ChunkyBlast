@@ -84,6 +84,11 @@ class HmmModel:
         #lets encode begin as M0, end as M_len(self.matchStates)+1
         for i in range(len(self.matchStates)+1):
             self.calcTransProb(i,i+1)
+        self.transit[("D",0)]= {}
+        
+        self.transit[("D",0)][("M",1)]=float("-inf")
+        self.transit[("D",0)][("D",1)]=float("-inf")
+
 
 
     def calcTransProb(self, state1Num, state2Num):
@@ -104,10 +109,10 @@ class HmmModel:
 
         # calculate all denominator types
         #plus 3 for number of states to transition to
-        demominatorM = sum([transitionD["M"+trans] for trans in PossibleTransFrom]) + len(PossibleTransTo)  # sum of MM, MI, MD
+        demominatorM = sum([transitionD["M"+trans] for trans in PossibleTransTo]) + len(PossibleTransTo)  # sum of MM, MI, MD
         if state1Num!=0:
-            demominatorD = sum([transitionD["D"+trans] for trans in PossibleTransFrom]) + len(PossibleTransTo)  # sum of DM, DI, DD
-        demominatorI = sum([transitionD["I"+trans] for trans in PossibleTransFrom]) + len(PossibleTransTo)  # sum of IM, II, ID
+            demominatorD = sum([transitionD["D"+trans] for trans in PossibleTransTo]) + len(PossibleTransTo)  # sum of DM, DI, DD
+        demominatorI = sum([transitionD["I"+trans] for trans in PossibleTransTo]) + len(PossibleTransTo)  # sum of IM, II, ID
         
         # for-loop to make all possible transition types
         for i in range(len(PossibleTransFrom)):
@@ -187,7 +192,7 @@ class HmmModel:
                     if numInserts!=0:
                         transitionD[stateTransType] += numInserts-1
                 
-            # return transitionD
+            return transitionD
         
         if state2Num==len(self.matchStates)+1:
             #special case for from last match to ending
@@ -221,9 +226,11 @@ class HmmModel:
                     stateTransType = "II"
                     if numInserts!=0:
                         transitionD[stateTransType] += numInserts-1
-            # return transitionD
+            return transitionD
 
         curPos = self.matchStates[state1Num-1] 
+        print("len match state", len(self.matchStates))
+        print("s2num:", state2Num)
         nextPos = self.matchStates[state2Num-1] 
         state1Col = [seq[1][curPos] for seq in self.info]
         state2Col = [seq[1][nextPos] for seq in self.info]

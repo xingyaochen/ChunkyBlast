@@ -23,7 +23,9 @@ if __name__ == "__main__":
 
     # load db
     alignment= hmmAlign.HmmAlign(protSeqFN,model)
-    score,_=alignment.viterbi()
+    score, L =alignment.viterbi()
+    print(score)
+    # print
 
     
 
