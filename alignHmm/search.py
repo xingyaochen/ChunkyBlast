@@ -1,4 +1,7 @@
 import sys, fasta
+import hmmmodel
+
+import hmmAlign
 
 
 #### Main
@@ -27,6 +30,13 @@ if __name__ == "__main__":
     for hd,sseq in dbL:
 
         # some stuff to get score here!
+        model=hmmmodel.HmmModel(seedAlignFN)
+
+    # load db
+        alignment= hmmAlign.HmmAlign(sseq,model)
+
+
+        score, L =alignment.viterbi()
         
         outL.append((score,hd))
 

@@ -22,7 +22,8 @@ if __name__ == "__main__":
     model=hmmmodel.HmmModel(seedAlignFN)
 
     # load db
-    alignment= hmmAlign.HmmAlign(protSeqFN,model)
+    sseq = fasta.load(protSeqFN)[0][1]
+    alignment= hmmAlign.HmmAlign(sseq,model)
     score, L =alignment.viterbi()
     print(score)
 

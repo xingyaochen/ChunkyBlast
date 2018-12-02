@@ -8,8 +8,8 @@ import numpy as np
 
 
 class HmmAlign:
-    def __init__(self, fastaName, hmmmodel):
-        self.seq = fasta.load(fastaName)[0][1]
+    def __init__(self, sseq, hmmmodel):
+        self.seq = sseq
         self.hmmmodel = hmmmodel 
         self.states = ['M', 'I', 'D']
 
