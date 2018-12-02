@@ -73,9 +73,9 @@ class HmmModel:
         # put probs in a dictionary
         for aa in aaList:
             if aa in countsD:
-                stateNumD[aa]=(countsD[aa]+1)/float(denominator)
+                stateNumD[aa]= math.log((countsD[aa]+1)/float(denominator))
             else:
-                stateNumD[aa] = 1.0/denominator
+                stateNumD[aa] = math.log(1.0/denominator)
 
         # put dictionary into meta dictionarys
         self.emmit[stateNum] = stateNumD

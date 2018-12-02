@@ -25,6 +25,8 @@ if __name__ == "__main__":
     alignment= hmmAlign.HmmAlign(protSeqFN,model)
     score, L =alignment.viterbi()
     print(score)
+
+    print(alignment.backTrack(L[0], L[1], L[2]))
     # print
 
     
