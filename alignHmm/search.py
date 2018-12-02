@@ -27,12 +27,14 @@ if __name__ == "__main__":
     dbL = fasta.load(dbSeqFN)
 
     outL=[]
+    model=hmmmodel.HmmModel(seedAlignFN)
     for hd,sseq in dbL:
 
         # some stuff to get score here!
-        model=hmmmodel.HmmModel(seedAlignFN)
+        
 
     # load db
+        print(hd)
         alignment= hmmAlign.HmmAlign(sseq,model)
 
 
