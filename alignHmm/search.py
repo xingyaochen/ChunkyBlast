@@ -38,7 +38,7 @@ if __name__ == "__main__":
         alignment= hmmAlign.HmmAlign(sseq,model)
 
 
-        score, L =alignment.viterbi()
+        score=alignment.subtractShuffleMean()
         
         outL.append((score,hd))
 

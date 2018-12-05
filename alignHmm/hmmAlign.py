@@ -4,6 +4,7 @@ import fasta
 import numpy as np
 # from hmmmodel import
 import numpy as np
+from random import shuffle
 
 
 
@@ -109,6 +110,17 @@ class HmmAlign:
         
         return bestScore, [v_m, v_i, v_d]
 
+    def subtractShuffleMean(self):
+        score,_=self.viterbi()
+        score_L=[]
+        l=list(self.seq)
+        for i in range(20):
+            shuffle(l)
+            alignment1= HmmAlign(l,self.hmmmodel)
+            random_score, _ =alignment1.viterbi()
+            score_L.append(random_score)
+        meanScore=np.mean(score_L)
+        return score-meanScore
 
     def backTrack(self, v_m, v_i, v_d):
         seq = self.seq
