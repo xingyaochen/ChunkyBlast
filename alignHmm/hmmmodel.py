@@ -47,9 +47,12 @@ class HmmModel:
 
     def calcAllEmitProb(self):
         for matchStateNum in range(len(self.matchStates)+1):
-            self.calcEmitProb(matchStateNum)
+            self.calcMEmitProb(matchStateNum)
+        for matchStateNum in range(len(self.matchStates)):
+            self.calcIEmitProb(matchStateNum)
+          
             
-    def calcEmitProb(self,stateNum):
+    def calcMEmitProb(self,stateNum):
         """
         calculate the emmision probability for matching state with number stateNum
         fill the entry in the dictionary
@@ -78,7 +81,39 @@ class HmmModel:
                 stateNumD[aa] = math.log(1.0/denominator)
 
         # put dictionary into meta dictionarys
-        self.emmit[stateNum] = stateNumD
+        self.emmit[("M", stateNum)] = stateNumD 
+    
+
+    def calcIEmitProb(self,stateNum):
+        columnData = [seq[1][self.matchStates[stateNum]:self.matchStates[stateNum+1]] for seq in self.info]
+        if columnData[0]:
+            columnDataFlat = reduce(lambda x, y: x+y, columnData)
+            # get the number of gaps, which is excluded in the denominator
+            countsD = Counter(columnDataFlat)
+            # get the number of gaps, which is excluded in the denominator
+            gaps = countsD.get('.')
+            #calulate denominator
+            denominator = len(columnDataFlat) + 20
+            if gaps:
+                denominator -= gaps
+            stateNumD = {}
+            # put probs in a dictionary
+            for aa in aaList:
+                if aa in countsD:
+                    stateNumD[aa]= math.log((countsD[aa]+1)/float(denominator))
+                else:
+                    stateNumD[aa] = math.log(1.0/denominator)
+            # put dictionary into meta dictionarys
+            self.emmit[("M", stateNum)] = stateNumD 
+            
+
+
+
+                
+
+
+
+
 
     def calAllTransProb(self):
         #lets encode begin as M0, end as M_len(self.matchStates)+1
