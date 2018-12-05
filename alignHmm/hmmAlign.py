@@ -59,19 +59,20 @@ class HmmAlign:
             for j in range(len(states)+2):
                 if j == 0:
                     # fill up only v_i 
-                    e_m = self.hmmmodel.getEmitProb(j, aa) 
+                    e_i = self.hmmmodel.getEmitProb(("I", j), aa) 
                     ami = self.hmmmodel.getTransitProb(('M', j), ('I', j))
                     aii = self.hmmmodel.getTransitProb(('I', j), ('I', j))
                     adi = self.hmmmodel.getTransitProb(('D', j), ('I', j))
-                    i_threeProbs = [v_m[j][i-1]['prob'] + ami , v_i[j][i-1]['prob'] + aii, v_d[j][i-1]['prob'] + adi]
-                    max_prob_i = np.amax(i_threeProbs)
+                    i_threeProbs =  [v_m[j][i-1]['prob'] + ami , v_i[j][i-1]['prob'] + aii, v_d[j][i-1]['prob'] + adi]
+                    max_prob_i = np.amax(i_threeProbs) + e_i
                     prev_state_i = (self.states[np.argmax(i_threeProbs)], j, i-1)
                     v_i[j][i] = {"prob": max_prob_i, "prev": prev_state_i}
                 else:
                     if j == len(states)+1:
                         e_m = 0
                     else:
-                        e_m = self.hmmmodel.getEmitProb(j, aa) 
+                        e_m = self.hmmmodel.getEmitProb(('M', j), aa)
+                        e_i = self.hmmmodel.getEmitProb(("I", j), aa)  
                         ami = self.hmmmodel.getTransitProb(('M', j), ('I', j))
                         aii = self.hmmmodel.getTransitProb(('I', j), ('I', j))
                         adi = self.hmmmodel.getTransitProb(('D', j), ('I', j))
@@ -83,7 +84,7 @@ class HmmAlign:
                         i_threeProbs = [v_m[j][i-1]['prob'] + ami , v_i[j][i-1]['prob'] + aii, v_d[j][i-1]['prob'] + adi]
         
                         d_threeProbs = [v_m[j-1][i]['prob'] + amd , v_i[j-1][i]['prob'] + aid, v_d[j-1][i]['prob'] + add]
-                        max_prob_i = np.amax(i_threeProbs)
+                        max_prob_i = np.amax(i_threeProbs) + e_i
                         max_prob_d = np.amax(d_threeProbs)
                         prev_state_i = (self.states[np.argmax(i_threeProbs)], j, i-1)
                         prev_state_d = (self.states[np.argmax(d_threeProbs)], j-1, i)

@@ -24,10 +24,10 @@ if __name__ == "__main__":
     # load db
     sseq = fasta.load(protSeqFN)[0][1]
     alignment= hmmAlign.HmmAlign(sseq,model)
-    score, L =alignment.viterbi()
+    score =alignment.subtractShuffleMean()
     print(score)
 
-    print(alignment.backTrack(L[0], L[1], L[2]))
+    # print(alignment.backTrack(L[0], L[1], L[2]))
     # print
 
     

@@ -1,6 +1,7 @@
 from fasta import load
 from collections import Counter
 import math
+from functools import reduce
 
 aaList=['G','A','L','M','F','W','K','Q','E','S','P','V','I','C','Y','H','R','N','D','T']
 class HmmModel:
@@ -16,8 +17,8 @@ class HmmModel:
 
     
 
-    def getEmitProb(self, stateNum, aa):
-        return self.emmit[stateNum][aa]
+    def getEmitProb(self, state, aa):
+        return self.emmit[state][aa]
     
     def getTransitProb(self, fromState, toState):
         """
@@ -48,7 +49,7 @@ class HmmModel:
     def calcAllEmitProb(self):
         for matchStateNum in range(len(self.matchStates)+1):
             self.calcMEmitProb(matchStateNum)
-        for matchStateNum in range(len(self.matchStates)):
+        for matchStateNum in range(len(self.matchStates)+1):
             self.calcIEmitProb(matchStateNum)
           
             
@@ -85,7 +86,13 @@ class HmmModel:
     
 
     def calcIEmitProb(self,stateNum):
-        columnData = [seq[1][self.matchStates[stateNum]:self.matchStates[stateNum+1]] for seq in self.info]
+        if stateNum == 0:
+            columnData = [seq[1][:self.matchStates[0]] for seq in self.info]
+        elif stateNum == len(self.matchStates):
+            columnData = [seq[1][(self.matchStates[-1]+1):] for seq in self.info]
+        else:
+            columnData = [seq[1][(self.matchStates[stateNum-1]+1):self.matchStates[stateNum]] for seq in self.info]
+        stateNumD = {}
         if columnData[0]:
             columnDataFlat = reduce(lambda x, y: x+y, columnData)
             # get the number of gaps, which is excluded in the denominator
@@ -96,21 +103,19 @@ class HmmModel:
             denominator = len(columnDataFlat) + 20
             if gaps:
                 denominator -= gaps
-            stateNumD = {}
+            
             # put probs in a dictionary
             for aa in aaList:
                 if aa in countsD:
                     stateNumD[aa]= math.log((countsD[aa]+1)/float(denominator))
                 else:
                     stateNumD[aa] = math.log(1.0/denominator)
-            # put dictionary into meta dictionarys
-            self.emmit[("M", stateNum)] = stateNumD 
-            
-
-
-
-                
-
+        else:
+            for aa in aaList:
+                stateNumD[aa]= math.log(1.0/20)
+        # put dictionary into meta dictionarys
+        self.emmit[("I", stateNum)] = stateNumD 
+        
 
 
 
