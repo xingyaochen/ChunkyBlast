@@ -33,14 +33,16 @@ class HmmAlign:
             v_m[j][0]= {"prob": float('-inf'), "prev": None}
         #end initializing M matrix
 
-        #initialize I matrix:
-        for j in range(len(states)+2):
+
+        v_i[0][0]={"prob": 0, "prev": None}
+
+        #initialize I matrix: #change v_i[0][0] to 0
+        for j in range(1, len(states)+2):
             #can't match fake position to any insertion state
             v_i[j][0]=  {"prob": float('-inf'), "prev": None}
         #end initialize I matrix
-        for i in range(1,len(seq)+1):
-            #I0 doesn't exit
-            v_i[0][i]=  {"prob": float('-inf'), "prev": None}
+
+
 
         #initialize D matrix:
         for i in range(1,len(seq)+1):
@@ -53,45 +55,54 @@ class HmmAlign:
         qxi=1
         for i in range(1, len(seq)+1):
             aa = seq[i-1]
-            for j in range(1, len(states)+2):
-                
-                if j == len(states)+1:
-                    e_m = 0
-
-                else:
+            for j in range(len(states)+2):
+                if j == 0:
+                    # fill up only v_i 
                     e_m = self.hmmmodel.getEmitProb(j, aa) 
                     ami = self.hmmmodel.getTransitProb(('M', j), ('I', j))
                     aii = self.hmmmodel.getTransitProb(('I', j), ('I', j))
                     adi = self.hmmmodel.getTransitProb(('D', j), ('I', j))
-
-                    amd = self.hmmmodel.getTransitProb(('M', j-1), ('D', j))
-                    aid = self.hmmmodel.getTransitProb(('I', j-1), ('D', j))
-                    add = self.hmmmodel.getTransitProb(('D', j-1), ('D', j))
-
                     i_threeProbs = [v_m[j][i-1]['prob'] + ami , v_i[j][i-1]['prob'] + aii, v_d[j][i-1]['prob'] + adi]
-       
-                    d_threeProbs = [v_m[j-1][i]['prob'] + amd , v_i[j-1][i]['prob'] + aid, v_d[j-1][i]['prob'] + add]
                     max_prob_i = np.amax(i_threeProbs)
-                    max_prob_d = np.amax(d_threeProbs)
                     prev_state_i = (self.states[np.argmax(i_threeProbs)], j, i-1)
-                    prev_state_d = (self.states[np.argmax(d_threeProbs)], j-1, i)
-
                     v_i[j][i] = {"prob": max_prob_i, "prev": prev_state_i}
-                    v_d[j][i] = {"prob": max_prob_d, "prev": prev_state_d}
+                else:
+                    if j == len(states)+1:
+                        e_m = 0
+                    else:
+                        e_m = self.hmmmodel.getEmitProb(j, aa) 
+                        ami = self.hmmmodel.getTransitProb(('M', j), ('I', j))
+                        aii = self.hmmmodel.getTransitProb(('I', j), ('I', j))
+                        adi = self.hmmmodel.getTransitProb(('D', j), ('I', j))
+
+                        amd = self.hmmmodel.getTransitProb(('M', j-1), ('D', j))
+                        aid = self.hmmmodel.getTransitProb(('I', j-1), ('D', j))
+                        add = self.hmmmodel.getTransitProb(('D', j-1), ('D', j))
+
+                        i_threeProbs = [v_m[j][i-1]['prob'] + ami , v_i[j][i-1]['prob'] + aii, v_d[j][i-1]['prob'] + adi]
+        
+                        d_threeProbs = [v_m[j-1][i]['prob'] + amd , v_i[j-1][i]['prob'] + aid, v_d[j-1][i]['prob'] + add]
+                        max_prob_i = np.amax(i_threeProbs)
+                        max_prob_d = np.amax(d_threeProbs)
+                        prev_state_i = (self.states[np.argmax(i_threeProbs)], j, i-1)
+                        prev_state_d = (self.states[np.argmax(d_threeProbs)], j-1, i)
+
+                        v_i[j][i] = {"prob": max_prob_i, "prev": prev_state_i}
+                        v_d[j][i] = {"prob": max_prob_d, "prev": prev_state_d}
 
 
-                #already logged
-                amm = self.hmmmodel.getTransitProb(('M', j-1), ('M', j))
-                aim = self.hmmmodel.getTransitProb(('I', j-1), ('M', j))
-                adm = self.hmmmodel.getTransitProb(('D', j-1), ('M', j))
-                m_threeProbs = [v_m[j-1][i-1]['prob'] + amm , v_i[j-1][i-1]['prob'] + aim, v_d[j-1][i-1]['prob'] + adm] 
+                    #already logged
+                    amm = self.hmmmodel.getTransitProb(('M', j-1), ('M', j))
+                    aim = self.hmmmodel.getTransitProb(('I', j-1), ('M', j))
+                    adm = self.hmmmodel.getTransitProb(('D', j-1), ('M', j))
+                    m_threeProbs = [v_m[j-1][i-1]['prob'] + amm , v_i[j-1][i-1]['prob'] + aim, v_d[j-1][i-1]['prob'] + adm] 
 
 
-                max_prob_m = np.amax(m_threeProbs)
-                
-                prev_state_m = (self.states[np.argmax(m_threeProbs)], j-1, i-1)
-                
-                v_m[j][i] = {"prob": e_m + max_prob_m, "prev": prev_state_m}
+                    max_prob_m = np.amax(m_threeProbs)
+                    
+                    prev_state_m = (self.states[np.argmax(m_threeProbs)], j-1, i-1)
+                    
+                    v_m[j][i] = {"prob": e_m + max_prob_m, "prev": prev_state_m}
 
 
         bestScore=v_m[len(states)+1][len(seq)]['prob'] # this is not last column 
@@ -131,27 +142,16 @@ class HmmAlign:
         return alignment_seq
 
 
-stateL = ['M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M',\
- 'M', 'M', 'M', 'M', 'M', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', \
- 'D', 'D', 'D', 'D', 'D', 'I', 'I', 'I', 'I', 'I', 'I', 'I', 'I',\
-  'I', 'I', 'I', 'I', 'I', 'I', 'I', 'I', 'I', 'I', 'I', 'I', 'D', 'M',\
-   'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'D', 'D', 'D', 'I',\
-    'I', 'I', 'I', 'I', 'I', 'I', 'I', 'I', 'I', 'D', 'D', 'D', 'D', 'D',\
-     'D', 'D', 'I', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'D',\
-      'D', 'D', 'D', 'I', 'I', 'I', 'I', 'I', 'D', 'D', 'I', 'M', 'M', 'M', \
-      'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M',\
-       'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'D', 'D', 'I', 'I',\
-        'D', 'I', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M',\
-         'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'D', 'D', 'D', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'D', 'D', 'D', 'D', 'D', 'I', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'I', 'I', 'I', 'I', 'I', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'D', 'D']
-
-
-seq = "LLIIGNWKMNKTYDEA-------------RDFINAFSNAYALNGAKISE-NIEYGIAPSFT---NMSLFNKELL-------EKTNINLVAQN----INENR--SGAFTGEISAQMLKSINAKYVIVGHSERRQ--NY-RETNKIVNQKAKAAIENGLIPIICVGESLEEYEAGKTKAVIKKQIKQSLEALDLS---KIVVAYEPIWAIGTGKVATAEVAQQICKFIRSI-----T---------SKDLIIQYGGSVSPSNIENLMKQEDIDGALVGGASLEVDSFFEL--"
 
 orig = "LLIIGNWKMNKTYDEARDFINAFSNAYALNGAKISENIEYGIAPSFTNMSLFNKELLEKTNINLVAQNINENRSGAFTGEISAQMLKSINAKYVIVGHSERRQNYRETNKIVNQKAKAAIENGLIPIICVGESLEEYEAGKTKAVIKKQIKQSLEALDLSKIVVAYEPIWAIGTGKVATAEVAQQICKFIRSITSKDLIIQYGGSVSPSNIENLMKQEDIDGALVGGASLEVDSFFELI"
 
+alignOne = "-LLIIGNWKMNKTYDE-------------ARDFINAFSNAYALNGAKIS-ENIEYGIAPSF---TNMSLFNKEL-------LEKTNINLVAQ----NINEN--RSGAFTGEISAQMLKSINAKYVIVGHSERR--QN-YRETNKIVNQKAKAAIENGLIPIICVGESLEEYEAGKTKAVIKKQIKQSLEALDL---SKIVVAYEPIWAIGTGKVATAEVAQQICKFIRS-----I---------TSKDLIIQYGGSVSPSNIENLMKQEDIDGALVGGASLEVDSFFE--"
+
+score = -393.103246770942
 
 seed = "ILIAGNWKMNM...RAESGASLAKGIVDAVGKS.....PAVE...VVLCPPSVYLSG.V\
  ADAVV.......GTPVE..LGAQNLYAAE.D.GAFTGEVNASMLTDVGCRFVILGHSERRQ\
 LMG...ETDACVAKKLHAALAGNLVPI.VCVGETLEQ...READDTESVIETQIRGSLEG\
 LDEA.R..AANIVIAYEPVWAIGT.GKTASKEQAEAVHAFIRELLGKMF..STEVAEQIR\
 IQYGGSVKPGNAEELLSQPNIDGALVGGSSLKVDDFAGII"
+

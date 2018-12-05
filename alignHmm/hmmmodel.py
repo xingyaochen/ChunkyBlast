@@ -88,6 +88,8 @@ class HmmModel:
         
         self.transit[("D",0)][("M",1)]=float("-inf")
         self.transit[("D",0)][("D",1)]=float("-inf")
+        self.transit[("D",0)][("I",0)]=float("-inf")
+
 
 
 
@@ -110,10 +112,10 @@ class HmmModel:
         # calculate all denominator types
         #plus 3 for number of states to transition to
         # print(transitionD)
-        demominatorM = sum([transitionD["M"+trans] for trans in PossibleTransFrom]) + len(PossibleTransTo)  # sum of MM, MI, MD
+        demominatorM = sum([transitionD["M"+trans] for trans in PossibleTransTo]) + len(PossibleTransTo)  # sum of MM, MI, MD
         if state1Num!=0:
-            demominatorD = sum([transitionD["D"+trans] for trans in PossibleTransFrom]) + len(PossibleTransTo)  # sum of DM, DI, DD
-        demominatorI = sum([transitionD["I"+trans] for trans in PossibleTransFrom]) + len(PossibleTransTo)  # sum of IM, II, ID
+            demominatorD = sum([transitionD["D"+trans] for trans in PossibleTransTo]) + len(PossibleTransTo)  # sum of DM, DI, DD
+        demominatorI = sum([transitionD["I"+trans] for trans in PossibleTransTo]) + len(PossibleTransTo)  # sum of IM, II, ID
         
         # for-loop to make all possible transition types
         for i in range(len(PossibleTransFrom)):
