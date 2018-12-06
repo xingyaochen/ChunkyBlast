@@ -1,0 +1,13 @@
+We added two files in addition to the starter code provided:
+hmmmodel.py: the profile HMM model class, which takes in the seeds file and constructs
+            the probabilistic model. The class has data structures that store the 
+            matching states, emission probabilities as well as the transition probabilities.
+
+hmmAlign.py: the alignment class. Takes in a profile HMM model object generated from hmmmodel.py,
+            aligns the searching sequence against the profile HMM model and use
+            viterbi algorithm to calculate the best alignment score.
+            The class also has a function "subtractShuffleMean()" that subtract the mean score of
+            of aligning shuffled sequences from the score of alignning the original
+            searching sequence.
+
+alignOne.py and search.py depends on both of the above files.
