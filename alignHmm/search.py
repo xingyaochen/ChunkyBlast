@@ -29,14 +29,9 @@ if __name__ == "__main__":
     outL=[]
     model=hmmmodel.HmmModel(seedAlignFN)
     for hd,sseq in dbL:
-
-        # some stuff to get score here!
-        
-
-    # load db
+        # load db
         print(hd)
         alignment= hmmAlign.HmmAlign(sseq,model)
-
 
         score=alignment.subtractShuffleMean()
         
