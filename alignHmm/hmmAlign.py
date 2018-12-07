@@ -1,8 +1,6 @@
 import math
 import fasta
-# from context import *
 import numpy as np
-# from hmmmodel import
 import numpy as np
 from random import shuffle
 
@@ -151,7 +149,6 @@ class HmmAlign:
             state = stateL[i]
             if state == 'M' or state == 'I' :
                 alignment_seq.append(seq.pop(0))
-                # print(len(seq))
             else:
                 alignment_seq.append('-')
         return alignment_seq

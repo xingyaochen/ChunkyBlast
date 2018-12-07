@@ -1,6 +1,5 @@
 import sys, fasta
 import hmmmodel
-
 import hmmAlign
 
 
@@ -30,7 +29,7 @@ if __name__ == "__main__":
     model=hmmmodel.HmmModel(seedAlignFN)
     for hd,sseq in dbL:
         # load db
-        print(hd)
+        print("aligning: "+hd)
         alignment= hmmAlign.HmmAlign(sseq,model)
 
         score=alignment.subtractShuffleMean()

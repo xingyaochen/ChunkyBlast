@@ -1,6 +1,5 @@
 import sys, fasta
 import hmmmodel
-
 import hmmAlign
     
 #### Main
@@ -27,8 +26,6 @@ if __name__ == "__main__":
     score =alignment.subtractShuffleMean()
     print(score)
 
-    # print(alignment.backTrack(L[0], L[1], L[2]))
-    # print
 
     
 
