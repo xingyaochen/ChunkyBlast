@@ -1,3 +1,5 @@
+
+Work by Ivy Liu and Xingyao Chen
 We added two files in addition to the starter code provided:
 hmmmodel.py: the profile HMM model class, which takes in the seeds file and constructs
             the probabilistic model. The class has data structures that store the 
@@ -11,3 +13,5 @@ hmmAlign.py: the alignment class. Takes in a profile HMM model object generated 
             searching sequence.
 
 alignOne.py and search.py depends on both of the above files.
+
+We validated our output with professor's output for both alignOne and search. For alignOne our result has about the same score. For search, we observed that the resulting scores have a couple of really high scores and others are much lower, which is what was told to expect in the project description.
